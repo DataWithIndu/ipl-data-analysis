@@ -18,6 +18,8 @@ Got this dataset from Kaggle. It has IPL match and ball-by-ball data from 2008 t
 - matches table: 2,180 matches
 - deliveries table: 2,60,920 ball by ball records
 
+Note: the Kaggle link below points to a version covering through 2020. The dataset used in this project was sourced separately and extended to cover through 2024.
+
 Dataset link: https://www.kaggle.com/datasets/patrickb1912/ipl-complete-dataset-20082020
 
 ---
@@ -42,7 +44,11 @@ Batter profiles with average, strike rate and boundary percentage. Bowler perfor
 
 **Level 3: Advanced Analysis**
 
-Built a custom Batter Performance Index using weighted scoring (40% strike rate, 35% batting average, 25% boundary impact). PD Salt ranks first despite having far fewer total runs than Kohli, which says a lot about what actually wins T20 games. Also built a rolling 5-match team momentum tracker using window functions, phase-wise bowler effectiveness rankings, partnership analysis across all batter pairs, and dismissal pattern breakdowns for the top 20 run scorers.
+Built a custom Batter Performance Index using weighted scoring. The weights reflect how T20 cricket actually works: strike rate gets the highest weight (40%) because scoring speed is the primary currency in T20 -- a batter who scores slowly costs the team even if they don't get out. Batting average (35%) captures consistency and the real cost of losing a wicket. Boundary impact (25%) measures match-changing ability but is partially captured by strike rate already, so it gets the lowest weight.
+
+One limitation worth noting though: the three metrics run on different numerical scales. Ideally they would be normalized to a common scale before applying weights so each component contributes exactly as intended. Without normalization the weights don't operate with full precision, so the index scores are best treated as relative rankings rather than exact measurements. The directional result still holds -- PD Salt ranking first reflects his strike rate of 169.61, which is genuinely the highest in the top 20 and reflects how T20 rewards efficiency over accumulation.
+
+Also built a rolling 5-match team momentum tracker using window functions, phase-wise bowler effectiveness rankings, partnership analysis across all batter pairs, and dismissal pattern breakdowns for the top 20 run scorers.
 
 **Level 4: Stored Procedures and Views**
 
@@ -54,15 +60,15 @@ Two stored procedures. One takes any batter and bowler name as input and returns
 
 **Teams and Strategy**
 
-Mumbai Indians' dominance is not just a perception thing. 256 wins and 11.74% of all IPL matches across 17 seasons puts them clearly ahead of every other franchise. KKR (228) and CSK (217) form a second tier but there is a visible gap.
+Mumbai Indians' dominance is not just a perception thing. 256 wins and 11.74% of all IPL matches across 17 seasons puts them clearly ahead of every other franchise. KKR (228) and CSK (217) form a second tier but there is a visible gap. For a sponsor evaluating long-term association, MI offers the lowest exposure to volatility of any franchise in the league.
 
-Winning the toss matters less than what you decide after winning it. Teams that chose to field first won 55.4% of the time compared to 45.6% for teams that batted first. The decision is more important than the coin flip.
+Winning the toss matters less than what you decide after winning it. Teams that chose to field first won 55.4% of the time compared to 45.6% for teams that batted first. The practical implication for franchise strategy: having reliable death-over bowling depth matters more than top-order batting depth, because teams are consistently choosing to chase when they win the toss.
 
 Rajasthan Royals won the very first IPL season in 2007/08 with an 81.25% win rate, 13 wins from 16 games. Mumbai Indians that same season had only 38.46%. The team that became the most dominant franchise in IPL history started near the bottom.
 
 RCB has struggled since season one, 28.57% win rate in 2007/08, and that pattern of strong individual performances but inconsistent team results shows up repeatedly across seasons. Deccan Chargers went from wooden spoon in 2007/08 to IPL champions in 2009, which shows how quickly things can flip.
 
-Bengaluru is the highest scoring city in IPL with an average of 1.50 runs per ball. Mumbai, despite hosting the most matches (173), averages only 1.35, meaning Wankhede is more balanced than its reputation suggests.
+Bengaluru is the highest scoring city in IPL with an average of 1.50 runs per ball. Mumbai, despite hosting the most matches (173), averages only 1.35, meaning Wankhede is more balanced than its reputation suggests. A franchise playing at Chinnaswamy needs a different batting composition than one playing at Wankhede -- the ground itself changes what a par score looks like.
 
 **Batting**
 
@@ -104,8 +110,8 @@ The 2020/21 season was played in UAE due to COVID. Scoring stayed at 323 average
 
 A few things I ran into while working with this dataset:
 
-- Venue names leaking into team columns in certain rows. 
-- Stray quote characters causing the same team or venue to appear twice. 
+- Venue names leaking into team columns in certain rows.
+- Stray quote characters causing the same team or venue to appear twice.
 - Invisible whitespace around values that broke standard filters and needed LTRIM and RTRIM to fix.
 - The same franchise appearing under different names across seasons (Delhi Daredevils became Delhi Capitals, Kings XI Punjab became Punjab Kings, and so on).
 - Toss decisions appearing in the winner column.
@@ -127,12 +133,6 @@ Each issue needed a different fix. This part of the project was more useful than
 - HAVING, GROUP BY, Aggregate Functions
 - String Functions (LTRIM, RTRIM, NOT LIKE)
 - JOINs
-
----
-
-## Future Scope
-
-Planning to add a dashboard layer on top of this analysis once I pick up a visualisation tool.
 
 ---
 
